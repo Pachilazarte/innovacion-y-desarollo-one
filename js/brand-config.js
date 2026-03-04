@@ -94,8 +94,8 @@ const BRAND_CONFIG = {
     // SUPERADMIN POR DEFECTO
     // ==========================================
     defaultSuperAdmin: {
-        username: 'Facundo',
-        password: 'Facundo'
+        username: 'AREAINNOVACIONDESARROLLO2026',
+        password: 'AREAINNOVACIONDESARROLLO2026'
     }
 };
 

@@ -207,7 +207,7 @@
 
     async function loginSuperAdmin(user, pass) {
         if (user === BRAND_CONFIG.defaultSuperAdmin.username && pass === BRAND_CONFIG.defaultSuperAdmin.password) {
-            saveSession({ username:'Facundo', email:'superadmin@one.com', rol:'superadmin' }, 'superadmin');
+            saveSession({ username:'AREAINNOVACIONDESARROLLO2026', email:'desarrolloiaescencial@gmail.com', rol:'superadmin' }, 'superadmin');
             window.location.href = './superadmin.html'; return;
         }
         const data = await db.loginAdmin(user, pass);
