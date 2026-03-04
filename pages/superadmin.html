@@ -1,0 +1,724 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="#060410">
+    <title>ONE | SuperAdmin</title>
+
+    <link rel="icon" type="image/png" href="../assets/favicon.png">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Exo+2:wght@300;400;600;700;800&display=swap" rel="stylesheet">
+
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+
+    <link rel="stylesheet" href="../css/styles.css">
+    <link rel="stylesheet" href="../css/pages/superadmin.css">
+</head>
+<body>
+
+    <!-- BG layers -->
+    <canvas id="starsCanvas"></canvas>
+    <div class="bg-hex"></div>
+    <div class="bg-cosmos"></div>
+
+    <!-- ===================== HEADER ===================== -->
+    <header class="sa-header" id="saHeader">
+        <div class="sa-header-inner">
+
+            <a href="../index.html" class="sa-logo">
+                <img src="../assets/one-logocolor.png" alt="ONE" class="sa-logo-img">
+                <div class="sa-logo-text">
+                    <span class="sa-logo-sub">Innovación & Desarrollo</span>
+                </div>
+            </a>
+
+            <nav class="sa-nav" id="mainNav">
+                <button class="sa-nav-btn active" onclick="switchSection('proyectos', this)">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/></svg>
+                    Proyectos
+                </button>
+                <button class="sa-nav-btn" onclick="switchSection('admins', this)">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+                    Administradores
+                </button>
+                <button class="sa-nav-btn" onclick="switchSection('usuarios', this)">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+                    Usuarios Demo
+                </button>
+            </nav>
+
+            <div class="sa-header-user">
+                <div class="sa-user-info">
+                    <span class="sa-user-name" id="userName">SuperAdmin</span>
+                    <span class="sa-user-badge">SUPER ADMIN</span>
+                </div>
+                <button class="btn-logout" onclick="logout()">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+                    Salir
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- ===================== MAIN ===================== -->
+    <main class="sa-main">
+
+        <!-- ── PROYECTOS ── -->
+        <div class="sa-section active" id="seccionProyectos">
+            <div class="sa-page-header">
+                <div>
+                    <h1 class="sa-page-title">Gestión de Proyectos</h1>
+                    <p class="sa-page-sub">Administrá todos los proyectos del sistema</p>
+                </div>
+                <button class="btn-primary" onclick="openNewProject()">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+                    Nuevo Proyecto
+                </button>
+            </div>
+
+            <!-- Stats -->
+            <div class="stats-grid" id="statsGrid"></div>
+
+            <!-- Search + Base tabs -->
+            <div class="sa-toolbar">
+                <div class="sa-search">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+                    <input type="text" placeholder="Buscar proyectos..." id="searchProjects" oninput="filterProjects()">
+                </div>
+                <div class="base-tabs" id="baseTabs"></div>
+            </div>
+
+            <!-- Projects grid -->
+            <div class="projects-grid" id="projectsGrid"></div>
+            <div class="sa-loading hidden" id="loadingState">
+                <div class="sa-spinner"></div>
+                <p>Cargando proyectos...</p>
+            </div>
+        </div>
+
+        <!-- ── ADMINISTRADORES ── -->
+        <div class="sa-section" id="seccionAdmins">
+            <div class="sa-page-header">
+                <div>
+                    <h1 class="sa-page-title">Administradores</h1>
+                    <p class="sa-page-sub">Gestioná los administradores del sistema</p>
+                </div>
+                <button class="btn-primary" onclick="openModal('adminModal')">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+                    Crear Administrador
+                </button>
+            </div>
+            <div class="sa-table-wrap">
+                <table class="sa-table">
+                    <thead>
+                        <tr>
+                            <th>Usuario</th><th>Contraseña</th><th>Email</th>
+                            <th>Rol</th><th>Creado por</th><th>Fecha</th><th>Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody id="adminsBody"></tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- ── USUARIOS DEMO ── -->
+        <div class="sa-section" id="seccionUsuarios">
+            <div class="sa-page-header">
+                <div>
+                    <h1 class="sa-page-title">Usuarios Demo</h1>
+                    <p class="sa-page-sub">Todos los usuarios demo del sistema</p>
+                </div>
+            </div>
+            <div class="sa-table-wrap">
+                <table class="sa-table">
+                    <thead>
+                        <tr>
+                            <th>Usuario</th><th>Email</th><th>Proyecto</th>
+                            <th>Intentos</th><th>Fecha</th><th>Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody id="usersBody"></tbody>
+                </table>
+            </div>
+        </div>
+
+    </main>
+
+<!-- ===================== FOOTER ===================== -->
+<footer class="premium-footer">
+    <div class="footer-container">
+        <div class="footer-left">
+            <img src="../assets/one-logoletra.png" alt="ONE" class="footer-logo-letra">
+            <span> | Todos los derechos reservados. © 2026</span>
+        </div>
+
+        <div class="footer-right">
+            <span class="developed-txt">Desarrollado por</span>
+            <a href="https://escencialconsultora.com.ar/" target="_blank" class="dev-link" title="Ir a Escencial Consultora" rel="noopener noreferrer">
+                <img src="../assets/one-logocolor.png" alt="ONE" class="dev-logo-one">
+                <span class="by-txt">by</span>
+                <img src="../assets/escencial-logoblanco.png" alt="Escencial" class="dev-logo-escencial">
+            </a>
+        </div>
+    </div>
+</footer>
+
+    <!-- ===================== MODALES ===================== -->
+
+    <!-- PROYECTO -->
+    <div class="modal-overlay" id="projectModal">
+        <div class="modal modal-lg">
+            <div class="modal-head">
+                <h3 class="modal-title" id="projectModalTitle">Nuevo Proyecto</h3>
+                <button class="modal-close" onclick="closeModal('projectModal')">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form id="projectForm">
+                    <input type="hidden" id="projectId">
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label class="form-label">Base / Sección *</label>
+                            <select class="form-select" id="projectBase" required>
+                                <option value="base 1">💼 Productos</option>
+                                <option value="base 2">🧰 Herramientas Digitales</option>
+                                <option value="base 3">🧾 Evaluaciones</option>
+                                <option value="base 4">📦 Empresas (personalizado)</option>
+                                <option value="base 5">📁 Escencial</option>
+                                <option value="base 6">🧑‍💼 Consultoria</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Encargado *</label>
+                            <select class="form-select" id="projectOwner" required>
+                                <option value="">Seleccionar...</option>
+                                <option value="Facundo">Facundo</option>
+                                <option value="Marcela">Marcela</option>
+                                <option value="Milenka">Milenka</option>
+                                <option value="Luciana">Luciana</option>
+                                <option value="Santiago">Santiago</option>
+                                <option value="Area Innovacion y Desarrollo">Área Innovación & Desarrollo</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Nombre del Proyecto *</label>
+                        <input type="text" class="form-input" id="projectName" required placeholder="Ej: Sistema de Gestión">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">¿Qué es?</label>
+                        <textarea class="form-textarea" id="projectQueEs" placeholder="Descripción del proyecto..."></textarea>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Enfocado a</label>
+                        <input type="text" class="form-input" id="projectEnfocado" placeholder="Ej: Empresas, Startups...">
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label class="form-label">Link Manual</label>
+                            <input type="url" class="form-input" id="projectManual" placeholder="https://...">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Link Maquetas</label>
+                            <input type="url" class="form-input" id="projectMaquetas" placeholder="https://...">
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label class="form-label">Link Beta</label>
+                            <input type="url" class="form-input" id="projectBeta" placeholder="https://...">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Link Final (Para demos)</label>
+                            <input type="url" class="form-input" id="projectFinal" placeholder="https://...">
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-foot">
+                <button class="btn-ghost-modal" onclick="closeModal('projectModal')">Cancelar</button>
+                <button class="btn-primary" onclick="saveProject()">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>
+                    Guardar
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ADMIN -->
+    <div class="modal-overlay" id="adminModal">
+        <div class="modal">
+            <div class="modal-head">
+                <h3 class="modal-title" id="adminModalTitle">Crear Administrador</h3>
+                <button class="modal-close" onclick="closeModal('adminModal')">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form id="adminForm">
+                    <input type="hidden" id="adminId" value="">
+                    <div class="form-group">
+                        <label class="form-label">Usuario del Admin *</label>
+                        <input type="text" class="form-input" id="adminUsername" required placeholder="Ej: Admin_Tello">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Contraseña *</label>
+                        <input type="password" class="form-input" id="adminPassword" required placeholder="Contraseña segura">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Email de referencia</label>
+                        <input type="email" class="form-input" id="adminEmail" placeholder="admin@email.com">
+                    </div>
+                </form>
+            </div>
+            <div class="modal-foot">
+                <button class="btn-ghost-modal" onclick="closeModal('adminModal')">Cancelar</button>
+                <button class="btn-primary" onclick="createAdmin()">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="8.5" cy="7" r="4"/><line x1="20" y1="8" x2="20" y2="14"/><line x1="23" y1="11" x2="17" y2="11"/></svg>
+                    Guardar Admin
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- DELETE -->
+    <div class="modal-overlay" id="deleteModal">
+        <div class="modal modal-sm">
+            <div class="modal-head">
+                <h3 class="modal-title">Confirmar Eliminación</h3>
+                <button class="modal-close" onclick="closeModal('deleteModal')">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+                </button>
+            </div>
+            <div class="modal-body modal-body-center">
+                <div class="delete-icon">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/><path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/></svg>
+                </div>
+                <p class="delete-text">¿Estás seguro de que deseas eliminar este elemento?</p>
+                <p class="delete-sub">Esta acción no se puede deshacer.</p>
+            </div>
+            <div class="modal-foot modal-foot-center">
+                <button class="btn-ghost-modal" onclick="closeModal('deleteModal')">Cancelar</button>
+                <button class="btn-danger" id="btnConfirmDelete">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/></svg>
+                    Eliminar
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- USER DETAILS -->
+    <div class="modal-overlay" id="userDetailsModal">
+        <div class="modal modal-lg">
+            <div class="modal-head">
+                <h3 class="modal-title" id="userDetailsTitle">Detalle Usuario</h3>
+                <button class="modal-close" onclick="closeModal('userDetailsModal')">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="sa-table-wrap">
+                    <table class="sa-table">
+                        <thead><tr><th>Proyecto</th><th>Base</th><th>Intentos</th></tr></thead>
+                        <tbody id="userDetailsBody"></tbody>
+                    </table>
+                </div>
+            </div>
+            <div class="modal-foot">
+                <button class="btn-ghost-modal" onclick="closeModal('userDetailsModal')">Cerrar</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="toast-container" id="toastContainer"></div>
+
+    <!-- ===================== SCRIPTS ===================== -->
+    <script src="../js/brand-config.js"></script>
+    <script src="../js/supabase-service.js"></script>
+    <script src="../js/shared.js"></script>
+    <script>
+    /* ── CANVAS ─────────────────────────────────────── */
+    (function () {
+        const cv  = document.getElementById('starsCanvas');
+        const ctx = cv.getContext('2d');
+        const PC  = ['#ff2d9b','#00f5ff','#8b5cf6','#39ff14'];
+        let W, H, stars, parts, frame = 0;
+        function resize() { W = cv.width = window.innerWidth; H = cv.height = Math.max(document.body.scrollHeight, window.innerHeight); }
+        function build() {
+            stars = Array.from({length:120}, () => ({ x:Math.random()*W, y:Math.random()*H, r:Math.random()*.8+.2, sp:Math.random()*.005+.002, ph:Math.random()*Math.PI*2 }));
+            parts = Array.from({length:12}, () => ({ x:Math.random()*W, y:Math.random()*H, r:Math.random()*1.5+.8, c:PC[Math.floor(Math.random()*PC.length)], vx:(Math.random()-.5)*.2, vy:(Math.random()-.5)*.2, sp:Math.random()*.007+.003, ph:Math.random()*Math.PI*2 }));
+        }
+        function draw() {
+            ctx.clearRect(0,0,W,H); frame++;
+            stars.forEach(s => { const a=.1+.4*(.5+.5*Math.sin(frame*s.sp+s.ph)); ctx.beginPath(); ctx.arc(s.x,s.y,s.r,0,Math.PI*2); ctx.fillStyle=`rgba(210,220,255,${a})`; ctx.fill(); });
+            parts.forEach(p => { p.x+=p.vx; p.y+=p.vy; if(p.x<0)p.x=W; if(p.x>W)p.x=0; if(p.y<0)p.y=H; if(p.y>H)p.y=0; const a=.2+.4*(.5+.5*Math.sin(frame*p.sp+p.ph)); ctx.save(); ctx.globalAlpha=a*.6; ctx.shadowBlur=8; ctx.shadowColor=p.c; ctx.fillStyle=p.c; ctx.beginPath(); ctx.arc(p.x,p.y,p.r,0,Math.PI*2); ctx.fill(); ctx.restore(); });
+            requestAnimationFrame(draw);
+        }
+        resize(); build(); draw();
+        window.addEventListener('resize',()=>{ resize(); build(); },{passive:true});
+    })();
+
+    /* ── HEADER SCROLL ──────────────────────────────── */
+    window.addEventListener('scroll', () => {
+        document.getElementById('saHeader').classList.toggle('is-scrolled', window.scrollY > 30);
+    }, {passive:true});
+
+    /* ── SESSION ────────────────────────────────────── */
+    let currentUser = null;
+    let currentRole = null;
+    let allProjects = {};
+    let currentBase = 'base 1';
+    let pendingDelete = null;
+    window.__userDetailsCache = {};
+
+    (function checkSession() {
+        const user = sessionStorage.getItem('one_user');
+        const role = sessionStorage.getItem('one_role');
+        if (!user || role !== 'superadmin') { window.location.href = './login.html'; return; }
+        currentUser = JSON.parse(user);
+        currentRole = role;
+        document.getElementById('userName').textContent = currentUser.username;
+    })();
+
+    document.addEventListener('DOMContentLoaded', () => {
+        lucide.createIcons();
+        setupModalClose();
+        renderBaseTabs();
+        loadAllData();
+    });
+
+    function logout() { sessionStorage.clear(); window.location.href = './login.html'; }
+
+    /* ── NAVIGATION ─────────────────────────────────── */
+    function switchSection(section, btn) {
+        document.querySelectorAll('.sa-nav-btn').forEach(t => t.classList.remove('active'));
+        if (btn) btn.classList.add('active');
+        document.querySelectorAll('.sa-section').forEach(s => s.classList.remove('active'));
+        document.getElementById('seccion' + section.charAt(0).toUpperCase() + section.slice(1)).classList.add('active');
+    }
+
+    function switchBase(base, btn) {
+        currentBase = base;
+        document.querySelectorAll('#baseTabs .base-tab-btn').forEach(t => t.classList.remove('active'));
+        if (btn) btn.classList.add('active');
+        renderProjects();
+    }
+
+    function renderBaseTabs() {
+        const container = document.getElementById('baseTabs');
+        if (!container) return;
+        container.innerHTML = Object.entries(BASES).map(([key, val], i) => `
+            <button class="base-tab-btn ${i === 0 ? 'active' : ''}" onclick="switchBase('${key}', this)">
+                ${val.icon} ${val.name}
+            </button>
+        `).join('');
+    }
+
+    /* ── LOAD DATA ──────────────────────────────────── */
+    async function loadAllData() {
+        await loadProjects();
+        await loadAdmins();
+        await loadUsers();
+        lucide.createIcons();
+    }
+
+    async function loadProjects() {
+        const loadingEl = document.getElementById('loadingState');
+        const gridEl    = document.getElementById('projectsGrid');
+        if (loadingEl) loadingEl.classList.remove('hidden');
+        if (gridEl)    gridEl.classList.add('hidden');
+        try {
+            const data = await db.getAllProjects();
+            window.__projectsById = new Map((data||[]).map(p => [String(p.id), p]));
+            allProjects = {};
+            Object.keys(BASES).forEach(b => allProjects[b] = []);
+            (data||[]).forEach(p => { const base = p.base||'base 1'; if (allProjects[base]) allProjects[base].push(p); });
+            renderProjects();
+            updateStats();
+        } catch (error) { showToast('Error al cargar proyectos', 'error'); }
+        finally {
+            if (loadingEl) loadingEl.classList.add('hidden');
+            if (gridEl)    gridEl.classList.remove('hidden');
+        }
+    }
+
+    function renderProjects() {
+        const grid     = document.getElementById('projectsGrid');
+        if (!grid) return;
+        const projects = allProjects[currentBase] || [];
+
+        if (!projects.length) {
+            grid.innerHTML = `
+                <div class="sa-empty">
+                    <div class="sa-empty-icon">📭</div>
+                    <h3>No hay proyectos</h3>
+                    <p>No hay proyectos en esta sección.</p>
+                </div>`;
+            return;
+        }
+
+        grid.innerHTML = projects.map(p => `
+            <article class="proj-card">
+                <div class="proj-card-top">
+                    <h3 class="proj-card-title">${escapeHtml(p.proyecto)}</h3>
+                    <div class="proj-card-actions">
+                        <button class="icon-btn" onclick="editProject('${p.id}')" title="Editar">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+                        </button>
+                        <button class="icon-btn icon-btn-danger" onclick="deleteItem('project', '${p.id}')" title="Eliminar">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/></svg>
+                        </button>
+                    </div>
+                </div>
+                <div class="proj-meta">
+                    <span class="proj-meta-item">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+                        ${escapeHtml(p.encargado)}
+                    </span>
+                    ${p.fecha ? `<span class="proj-meta-item">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+                        ${formatDate(p.fecha)}
+                    </span>` : ''}
+                </div>
+                ${p.que_es     ? `<p class="proj-desc">${escapeHtml(p.que_es)}</p>`          : ''}
+                ${p.enfocado_a ? `<p class="proj-focus">🎯 ${escapeHtml(p.enfocado_a)}</p>` : ''}
+                <div class="proj-links">
+                    ${p.manual   ? `<a href="${escapeHtml(p.manual)}"   target="_blank" class="proj-link">📖 Manual</a>`   : ''}
+                    ${p.maquetas ? `<a href="${escapeHtml(p.maquetas)}" target="_blank" class="proj-link">🎨 Maquetas</a>` : ''}
+                    ${p.beta     ? `<a href="${escapeHtml(p.beta)}"     target="_blank" class="proj-link">🧾 Beta</a>`     : ''}
+                    ${p.final    ? `<a href="${escapeHtml(p.final)}"    target="_blank" class="proj-link proj-link-final">✅ Final</a>` : ''}
+                </div>
+            </article>
+        `).join('');
+        lucide.createIcons();
+    }
+
+    function updateStats() {
+        const el = document.getElementById('statsGrid');
+        if (!el) return;
+        let total = 0;
+        Object.values(allProjects).forEach(arr => total += arr.length);
+        el.innerHTML = `
+            <div class="stat-card"><span class="stat-num">${total}</span><span class="stat-lbl">Total</span></div>
+            ${Object.entries(BASES).map(([key, val]) => `
+                <div class="stat-card"><span class="stat-num">${allProjects[key]?.length||0}</span><span class="stat-lbl">${val.name}</span></div>
+            `).join('')}
+        `;
+    }
+
+    function filterProjects() {
+        const q = (document.getElementById('searchProjects')?.value||'').toLowerCase();
+        document.querySelectorAll('.proj-card').forEach(c => { c.style.display = c.textContent.toLowerCase().includes(q) ? '' : 'none'; });
+    }
+
+    /* ── CRUD PROYECTOS ─────────────────────────────── */
+    function openNewProject() {
+        document.getElementById('projectModalTitle').textContent = 'Nuevo Proyecto';
+        document.getElementById('projectForm').reset();
+        document.getElementById('projectId').value = '';
+        document.getElementById('projectBase').value = currentBase;
+        openModal('projectModal');
+    }
+
+    function editProject(id) {
+        const p = (allProjects[currentBase]||[]).find(x => x.id === id);
+        if (!p) return showToast('Proyecto no encontrado', 'error');
+        document.getElementById('projectModalTitle').textContent = 'Editar Proyecto';
+        document.getElementById('projectId').value      = p.id;
+        document.getElementById('projectBase').value    = p.base;
+        document.getElementById('projectName').value    = p.proyecto   || '';
+        document.getElementById('projectOwner').value   = p.encargado  || '';
+        document.getElementById('projectQueEs').value   = p.que_es     || '';
+        document.getElementById('projectEnfocado').value = p.enfocado_a|| '';
+        document.getElementById('projectManual').value  = p.manual     || '';
+        document.getElementById('projectMaquetas').value= p.maquetas   || '';
+        document.getElementById('projectBeta').value    = p.beta       || '';
+        document.getElementById('projectFinal').value   = p.final      || '';
+        openModal('projectModal');
+    }
+
+    async function saveProject() {
+        const id   = document.getElementById('projectId').value;
+        const data = {
+            base:       document.getElementById('projectBase').value,
+            proyecto:   document.getElementById('projectName').value.trim(),
+            encargado:  document.getElementById('projectOwner').value,
+            que_es:     document.getElementById('projectQueEs').value.trim(),
+            enfocado_a: document.getElementById('projectEnfocado').value.trim(),
+            manual:     document.getElementById('projectManual').value.trim(),
+            maquetas:   document.getElementById('projectMaquetas').value.trim(),
+            beta:       document.getElementById('projectBeta').value.trim(),
+            final:      document.getElementById('projectFinal').value.trim()
+        };
+        if (!data.proyecto || !data.encargado) return showToast('Complete los campos obligatorios', 'error');
+        try {
+            if (id) { await db.updateProject(id, data); showToast('Proyecto actualizado', 'success'); }
+            else    { await db.createProject(data);     showToast('Proyecto creado', 'success'); }
+            closeModal('projectModal');
+            await loadProjects();
+        } catch { showToast('Error al guardar', 'error'); }
+    }
+
+    /* ── CRUD ADMINS ────────────────────────────────── */
+    async function loadAdmins() {
+        try {
+            const data = await db.getAdmins();
+            window.__adminsCache = data || [];
+            const tbody = document.getElementById('adminsBody');
+            if (!tbody) return;
+            tbody.innerHTML = (data||[]).map(a => {
+                const safeId = String(a.id||'').replace(/"/g,'&quot;');
+                return `<tr>
+                    <td><strong>${escapeHtml(a.admin_username||'-')}</strong></td>
+                    <td>
+                        <span class="pwd-mask" id="pwdMask-${safeId}">••••••</span>
+                        <span class="pwd-real hidden" id="pwdReal-${safeId}">${escapeHtml(a.admin_password||'')}</span>
+                        <button class="icon-btn" type="button" onclick="togglePwd('${safeId}')" style="margin-left:6px;">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+                        </button>
+                    </td>
+                    <td>${escapeHtml(a.admin_email||'-')}</td>
+                    <td><span class="role-badge ${a.rol==='superadmin'?'role-super':'role-admin'}">${escapeHtml(a.rol||'-')}</span></td>
+                    <td>${escapeHtml(a.creado_por||'-')}</td>
+                    <td>${formatDate(a.fecha||'')}</td>
+                    <td class="td-actions">
+                        <button class="icon-btn" onclick="openEditAdmin('${safeId}')">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+                        </button>
+                        ${a.rol!=='superadmin'?`<button class="icon-btn icon-btn-danger" onclick="deleteItem('admin','${safeId}')">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/></svg>
+                        </button>`:''}
+                    </td>
+                </tr>`;
+            }).join('');
+            lucide.createIcons();
+        } catch(e) { console.error(e); }
+    }
+
+    function togglePwd(id) {
+        const mask = document.getElementById(`pwdMask-${id}`);
+        const real = document.getElementById(`pwdReal-${id}`);
+        if (!mask||!real) return;
+        const hidden = real.classList.contains('hidden');
+        real.classList.toggle('hidden', !hidden);
+        mask.classList.toggle('hidden', hidden);
+    }
+
+    function openEditAdmin(id) {
+        const admin = (window.__adminsCache||[]).find(a => String(a.id)===String(id));
+        if (!admin) return showToast('Admin no encontrado','error');
+        document.getElementById('adminModalTitle').textContent = 'Editar Administrador';
+        document.getElementById('adminId').value       = admin.id;
+        document.getElementById('adminUsername').value = admin.admin_username||'';
+        document.getElementById('adminPassword').value = admin.admin_password||'';
+        document.getElementById('adminEmail').value    = admin.admin_email||'';
+        openModal('adminModal');
+    }
+
+    async function saveAdmin() {
+        const id              = document.getElementById('adminId').value;
+        const admin_username  = document.getElementById('adminUsername').value.trim();
+        const admin_password  = document.getElementById('adminPassword').value;
+        const admin_email     = document.getElementById('adminEmail').value.trim();
+        if (!admin_username||!admin_password) return showToast('Complete los campos obligatorios','error');
+        try {
+            const payload = { admin_username, admin_password, admin_email, rol:'admin', creado_por:currentUser.username, user_superadmin:currentUser.username, email_superadmin:currentUser.email||'' };
+            if (id) { await db.updateAdmin(id, payload); showToast('Administrador actualizado','success'); }
+            else    { await db.createAdmin(payload);     showToast('Administrador creado','success'); }
+            closeModal('adminModal');
+            document.getElementById('adminForm').reset();
+            await loadAdmins();
+        } catch(e) { console.error(e); showToast('Error al guardar admin','error'); }
+    }
+
+    async function createAdmin() { return saveAdmin(); }
+
+    /* ── USUARIOS DEMO ──────────────────────────────── */
+    async function loadUsers() {
+        try {
+            const data  = await db.getUsuarios(null);
+            const tbody = document.getElementById('usersBody');
+            if (!tbody) return;
+            const byId  = window.__projectsById || new Map();
+            tbody.innerHTML = (data||[]).map(u => {
+                const ids   = splitSemi(u.proyecto_id);
+                const bases = splitSemi(u.base_nombre);
+                const rest  = splitSemi(u.intentos_restantes).map(v=>toIntSafe(v,0));
+                const lim   = splitSemi(u.limite_usos).map(v=>toIntSafe(v,0));
+                const n     = Math.max(ids.length,bases.length,rest.length,lim.length);
+                const items = Array.from({length:n}).map((_,i) => {
+                    const id   = ids[i]??'';
+                    const base = bases[i]??'';
+                    const r    = rest[i]??0;
+                    const l    = lim[i]??r;
+                    const proj = byId.get(String(id));
+                    return { id, base, r, l, name: proj?.proyecto||(id?`#${id}`:'Proyecto') };
+                }).filter(x=>x.id);
+                window.__userDetailsCache[String(u.id)] = { username:u.usuariodemo_user, items };
+                const summary = items.slice(0,3).map(x=>x.name).join(', ')+(items.length>3?` +${items.length-3}`:'');
+                const chips   = items.slice(0,4).map(x=>`<span class="attempt-badge ${x.r>0?'attempt-ok':'attempt-ko'}">${escapeHtml(x.name)}: ${x.r}/${x.l}</span>`).join('')+(items.length>4?`<span class="attempt-badge">+${items.length-4} más</span>`:'');
+                return `<tr>
+                    <td><strong>${escapeHtml(u.usuariodemo_user)}</strong></td>
+                    <td>${escapeHtml(u.usuariodemo_correo||'-')}</td>
+                    <td>
+                        <div style="display:flex;flex-direction:column;gap:6px;">
+                            <span style="font-size:.82rem;color:var(--c-mist);">${escapeHtml(summary||'-')}</span>
+                            <a href="#" class="proj-link" onclick="openUserDetails('${u.id}');return false;">🔎 Ver detalle</a>
+                        </div>
+                    </td>
+                    <td><div class="chips-wrap">${chips}</div></td>
+                    <td>${formatDate(u.fecha)}</td>
+                    <td><button class="icon-btn icon-btn-danger" onclick="deleteItem('user','${u.id}')">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/></svg>
+                    </button></td>
+                </tr>`;
+            }).join('');
+            lucide.createIcons();
+        } catch(e) { console.error(e); }
+    }
+
+    function openUserDetails(rowId) {
+        try {
+            const entry = window.__userDetailsCache?.[String(rowId)];
+            if (!entry) { showToast('No hay detalle disponible','error'); return; }
+            document.getElementById('userDetailsTitle').textContent = `Detalle: ${entry.username}`;
+            document.getElementById('userDetailsBody').innerHTML = (entry.items||[]).map(x=>`
+                <tr>
+                    <td>${escapeHtml(x.name||'')} <span style="color:var(--c-slate);font-size:.78rem;">(${escapeHtml(String(x.id||''))})</span></td>
+                    <td>${escapeHtml(x.base||'-')}</td>
+                    <td><span class="attempt-badge ${x.r>0?'attempt-ok':'attempt-ko'}">${x.r}/${x.l}</span></td>
+                </tr>
+            `).join('');
+            openModal('userDetailsModal');
+            lucide.createIcons();
+        } catch(e) { console.error(e); showToast('No se pudo abrir el detalle','error'); }
+    }
+
+    /* ── DELETE ─────────────────────────────────────── */
+    function deleteItem(type, id) {
+        pendingDelete = { type, id };
+        document.getElementById('btnConfirmDelete').onclick = confirmDelete;
+        openModal('deleteModal');
+    }
+
+    async function confirmDelete() {
+        if (!pendingDelete) return;
+        try {
+            if (pendingDelete.type==='project') await db.deleteProject(pendingDelete.id);
+            else if (pendingDelete.type==='admin') await db.deleteAdmin(pendingDelete.id);
+            else if (pendingDelete.type==='user')  await db.deleteUsuario(pendingDelete.id);
+            showToast('Eliminado correctamente','success');
+            closeModal('deleteModal');
+            if (pendingDelete.type==='project') await loadProjects();
+            else if (pendingDelete.type==='admin') await loadAdmins();
+            else await loadUsers();
+        } catch { showToast('Error al eliminar','error'); }
+        pendingDelete = null;
+    }
+    </script>
+</body>
+</html>

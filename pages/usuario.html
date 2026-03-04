@@ -1,0 +1,469 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="#060410">
+    <title>ONE | Portal Demo</title>
+
+    <link rel="icon" type="image/png" href="../assets/favicon.png">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Exo+2:wght@300;400;600;700;800&display=swap" rel="stylesheet">
+
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+
+    <link rel="stylesheet" href="../css/styles.css">
+    <link rel="stylesheet" href="../css/pages/usuario.css">
+</head>
+<body>
+
+    <canvas id="starsCanvas"></canvas>
+    <div class="bg-hex"></div>
+    <div class="bg-cosmos"></div>
+
+    <!-- ── HEADER ── -->
+    <header class="ud-header" id="udHeader">
+        <div class="ud-header-inner">
+            <a href="../index.html" class="ud-logo">
+                <img src="../assets/one-logocolor.png" alt="ONE" class="ud-logo-img">
+                <div class="ud-logo-text">
+                    <span class="ud-logo-name">ONE</span>
+                    <span class="ud-logo-sub">Innovation &amp; Development</span>
+                </div>
+            </a>
+
+            <div class="ud-header-right">
+                <div class="ud-user-pill">
+                    <div class="ud-avatar" id="userAvatar">U</div>
+                    <div class="ud-user-info">
+                        <span class="ud-user-name" id="userName">Usuario</span>
+                        <span class="ud-user-role">USUARIO DEMO</span>
+                    </div>
+                </div>
+                <button class="ud-btn-logout" onclick="logout()">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+                    Salir
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- ── MAIN ── -->
+    <main class="ud-main" id="mainContent">
+        <div class="ud-loading" id="loadingState">
+            <div class="ud-spinner"></div>
+            <p>Cargando tus proyectos...</p>
+        </div>
+    </main>
+
+<!-- ===================== FOOTER ===================== -->
+<footer class="premium-footer">
+    <div class="footer-container">
+        <div class="footer-left">
+            <img src="../assets/one-logoletra.png" alt="ONE" class="footer-logo-letra">
+            <span> | Todos los derechos reservados. © 2026</span>
+        </div>
+
+        <div class="footer-right">
+            <span class="developed-txt">Desarrollado por</span>
+            <a href="https://escencialconsultora.com.ar/" target="_blank" class="dev-link" title="Ir a Escencial Consultora" rel="noopener noreferrer">
+                <img src="../assets/one-logocolor.png" alt="ONE" class="dev-logo-one">
+                <span class="by-txt">by</span>
+                <img src="../assets/escencial-logoblanco.png" alt="Escencial" class="dev-logo-escencial">
+            </a>
+        </div>
+    </div>
+</footer>
+
+
+<!-- ── MODAL: DETALLE PROYECTO ── -->
+<div class="modal-overlay" id="detailsModal">
+    <div class="modal modal-lg">
+        <div class="modal-head">
+            <h3 class="modal-title" id="detailsTitle">Detalle del proyecto</h3>
+            <button class="modal-close" onclick="closeModal('detailsModal')">
+                <svg xmlns="http://www.w3.org/2000/svg" width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                    <line x1="18" y1="6" x2="6" y2="18"/>
+                    <line x1="6" y1="6" x2="18" y2="18"/>
+                </svg>
+            </button>
+        </div>
+
+        <div class="modal-body" id="detailsBody">
+            <!-- se completa por JS -->
+        </div>
+
+        <div class="modal-foot">
+            <button class="ud-btn-ghost" onclick="closeModal('detailsModal')">Cerrar</button>
+        </div>
+    </div>
+</div>
+    <!-- ── MODAL: CONFIRMAR INTENTO ── -->
+    <div class="modal-overlay" id="confirmModal">
+        <div class="modal modal-sm">
+            <div class="modal-head">
+                <h3 class="modal-title">Confirmar uso</h3>
+                <button class="modal-close" onclick="closeModal('confirmModal')">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+                </button>
+            </div>
+            <div class="modal-body modal-body-center">
+                <div class="confirm-icon">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
+                </div>
+                <p class="confirm-title">¿Usás un intento?</p>
+                <p class="confirm-sub">Al confirmar se descontará <strong>1 intento</strong> de esta demo.</p>
+                <div class="confirm-attempts-wrap">
+                    <span class="confirm-attempts-num" id="confirmAttempts">5</span>
+                    <span class="confirm-attempts-lbl">intentos restantes</span>
+                </div>
+                <p class="confirm-warn">Esta acción no se puede deshacer.</p>
+            </div>
+            <div class="modal-foot modal-foot-center">
+                <button class="ud-btn-ghost" onclick="closeModal('confirmModal')">Cancelar</button>
+                <button class="ud-btn-primary" id="btnConfirmAttempt">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+                    Confirmar y acceder
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ── IFRAME VIEWER ── -->
+    <div class="iframe-viewer" id="iframeViewer">
+        <div class="iframe-bar">
+            <div class="iframe-bar-left">
+                <div class="iframe-dot"></div>
+                <span class="iframe-title" id="iframeTitle">Proyecto Demo</span>
+            </div>
+            <button class="ud-btn-close-iframe" onclick="closeIframeViewer()">
+                <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+                Cerrar proyecto
+            </button>
+        </div>
+        <iframe id="projectIframe" src="about:blank"></iframe>
+    </div>
+
+    <div class="toast-container" id="toastContainer"></div>
+
+    <script src="../js/brand-config.js"></script>
+    <script src="../js/supabase-service.js"></script>
+    <script src="../js/shared.js"></script>
+    <script>
+    /* ── CANVAS ── */
+    (function () {
+        const cv = document.getElementById('starsCanvas'), ctx = cv.getContext('2d');
+        const PC = ['#ff2d9b','#00f5ff','#8b5cf6','#39ff14'];
+        let W, H, stars, parts, frame = 0;
+        function resize() { W = cv.width = window.innerWidth; H = cv.height = Math.max(document.body.scrollHeight, window.innerHeight); }
+        function build() {
+            stars = Array.from({length:130},()=>({x:Math.random()*W,y:Math.random()*H,r:Math.random()*.8+.2,sp:Math.random()*.005+.002,ph:Math.random()*Math.PI*2}));
+            parts = Array.from({length:14},()=>({x:Math.random()*W,y:Math.random()*H,r:Math.random()*1.5+.8,c:PC[Math.floor(Math.random()*PC.length)],vx:(Math.random()-.5)*.2,vy:(Math.random()-.5)*.2,sp:Math.random()*.007+.003,ph:Math.random()*Math.PI*2}));
+        }
+        function draw() {
+            ctx.clearRect(0,0,W,H); frame++;
+            stars.forEach(s=>{const a=.1+.4*(.5+.5*Math.sin(frame*s.sp+s.ph));ctx.beginPath();ctx.arc(s.x,s.y,s.r,0,Math.PI*2);ctx.fillStyle=`rgba(210,220,255,${a})`;ctx.fill();});
+            parts.forEach(p=>{p.x+=p.vx;p.y+=p.vy;if(p.x<0)p.x=W;if(p.x>W)p.x=0;if(p.y<0)p.y=H;if(p.y>H)p.y=0;const a=.2+.4*(.5+.5*Math.sin(frame*p.sp+p.ph));ctx.save();ctx.globalAlpha=a*.6;ctx.shadowBlur=8;ctx.shadowColor=p.c;ctx.fillStyle=p.c;ctx.beginPath();ctx.arc(p.x,p.y,p.r,0,Math.PI*2);ctx.fill();ctx.restore();});
+            requestAnimationFrame(draw);
+        }
+        resize(); build(); draw();
+        window.addEventListener('resize',()=>{resize();build();},{passive:true});
+    })();
+
+    /* ── HEADER SCROLL ── */
+    window.addEventListener('scroll',()=>{ document.getElementById('udHeader').classList.toggle('is-scrolled',window.scrollY>30); },{passive:true});
+
+    /* ── SESSION ── */
+    let currentUser = null;
+    let pendingIframe = null;
+
+    (function checkSession() {
+        const user = sessionStorage.getItem('one_user');
+        const role = sessionStorage.getItem('one_role');
+        if (!user || role !== 'usuario') { window.location.href = './login.html'; return; }
+        currentUser = JSON.parse(user);
+        const name = currentUser.username || 'U';
+        document.getElementById('userName').textContent = name;
+        document.getElementById('userAvatar').textContent = name.charAt(0).toUpperCase();
+    })();
+
+    document.addEventListener('DOMContentLoaded', () => {
+        lucide.createIcons();
+        setupModalClose();
+        loadAndRender();
+    });
+
+    function logout() { sessionStorage.clear(); window.location.href = './login.html'; }
+
+    /* ── LOAD & RENDER ── */
+    async function loadAndRender() {
+        try {
+            const data = await db.getAllProjects();
+            window.__projectsById = new Map((data||[]).map(p => [String(p.id), p]));
+        } catch(e) { console.error(e); }
+        renderApp();
+    }
+
+function renderApp() {
+    const packed = currentUser?.packed;
+    const byId   = window.__projectsById || new Map();
+
+    const bases  = splitSemi(packed?.base_nombre);
+    const ids    = splitSemi(packed?.proyecto_id);
+    const rest   = splitSemi(packed?.intentos_restantes).map(v => toIntSafe(v, 0));
+    const lim    = splitSemi(packed?.limite_usos).map(v => toIntSafe(v, 0));
+    const finals = splitSemi(packed?.final);
+    const count  = Math.max(ids.length, bases.length, rest.length, lim.length, finals.length);
+
+    const items = Array.from({length:count}).map((_,i) => {
+        const id    = ids[i]    ?? '';
+        const base  = bases[i]  ?? '';
+        const r     = rest[i]   ?? 0;
+        const l     = lim[i]    ?? r;
+        const url   = finals[i] ?? '';
+        const proj  = byId.get(String(id)) || null;
+        const name  = proj?.proyecto || (id ? `Proyecto #${id}` : 'Proyecto');
+        const owner = proj?.encargado || '';
+        const what  = (proj?.que_es || '').trim();
+        const focus = (proj?.enfocado_a || '').trim();
+        const manual= (proj?.manual || '').trim();
+const full  = what; // ✅ completo para modal
+const desc  = full.length > 140 ? full.slice(0, 140).trim() + '…' : full; // ✅ corto para card
+return { idx:i, id, base, r, l, url, name, owner, desc, full, focus, manual };
+    }).filter(x => x.id || x.url);
+
+    // ✅ Guardar global para el modal de detalle
+    window.__ud_items = items;
+
+    const totalProj   = items.length;
+    const available   = items.filter(x => x.r > 0).length;
+    const totalUsed   = items.reduce((s,x) => s + (x.l - x.r), 0);
+
+    document.getElementById('mainContent').innerHTML = `
+        ...
+            <!-- WELCOME HERO -->
+            <section class="ud-hero">
+                <div class="ud-hero-inner">
+                    <div class="ud-welcome">
+                        <span class="ud-welcome-label">Portal Demo</span>
+                        <h1 class="ud-welcome-title">Bienvenido, <span class="ud-name-gradient">${escapeHtml(currentUser.username)}</span></h1>
+                        <p class="ud-welcome-sub">Accedé a los proyectos habilitados para tu cuenta demo.</p>
+                    </div>
+                    <div class="ud-summary-cards">
+                        <div class="ud-sum-card">
+                            <span class="ud-sum-num">${totalProj}</span>
+                            <span class="ud-sum-lbl">Proyectos asignados</span>
+                        </div>
+                        <div class="ud-sum-card">
+                            <span class="ud-sum-num ud-sum-green">${available}</span>
+                            <span class="ud-sum-lbl">Disponibles</span>
+                        </div>
+                        <div class="ud-sum-card">
+                            <span class="ud-sum-num ud-sum-pink">${totalUsed}</span>
+                            <span class="ud-sum-lbl">Accesos usados</span>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- PROJECTS -->
+            <section class="ud-projects-section">
+                <div class="ud-projects-inner">
+                    <div class="ud-section-label">
+                        <span class="section-label-pill">TUS PROYECTOS</span>
+                    </div>
+
+                    ${items.length === 0 ? `
+                        <div class="ud-empty">
+                            <div class="ud-empty-icon">📭</div>
+                            <h3>Sin proyectos asignados</h3>
+                            <p>No tenés proyectos habilitados aún. Contactá a tu administrador.</p>
+                        </div>
+                    ` : `
+                        <div class="ud-projects-grid">
+                            ${items.map(p => {
+                                const exhausted = p.r <= 0;
+                                const pct = p.l > 0 ? Math.round((p.r / p.l) * 100) : 0;
+                                const barColor = pct > 50 ? 'var(--c-lime)' : pct > 20 ? 'var(--c-gold)' : 'var(--c-red)';
+                                return `
+                                <article class="ud-proj-card ${exhausted ? 'ud-proj-exhausted' : ''}">
+                                    <!-- Top accent -->
+                                    <div class="ud-proj-accent"></div>
+
+                                    <!-- Header -->
+                                    <div class="ud-proj-head">
+                                        <div class="ud-proj-icon ${exhausted ? 'ud-proj-icon-off' : ''}">
+                                            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/></svg>
+                                        </div>
+                                        <div class="ud-proj-head-text">
+                                            <h3 class="ud-proj-title">${escapeHtml(p.name)}</h3>
+                                            <div class="ud-proj-meta">
+                                                <span class="ud-proj-base">📁 ${escapeHtml(p.base||'-')}</span>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <!-- Description -->
+${p.desc ? `<p class="ud-proj-desc">${escapeHtml(p.desc)}</p>` : ''}
+
+<button class="ud-btn-details" type="button" onclick="openDetails(${p.idx})">
+  <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round">
+    <circle cx="11" cy="11" r="8"></circle>
+    <path d="m21 21-4.3-4.3"></path>
+  </svg>
+  Ver más
+</button>
+                                    ${p.focus ? `<p class="ud-proj-focus">🎯Aréas: ${escapeHtml(p.focus)}</p>` : ''}
+
+                                    <!-- Manual link -->
+                                    ${p.manual ? `
+                                    <a href="${escapeHtml(p.manual)}" target="_blank" rel="noopener noreferrer" class="ud-proj-manual">
+                                        <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg>
+                                        Ver Manual
+                                    </a>` : ''}
+
+                                    <!-- Attempts -->
+                                    <div class="ud-attempts-wrap">
+                                        <div class="ud-attempts-top">
+                                            <span class="ud-attempts-label">Intentos disponibles</span>
+                                            <span class="ud-attempts-count ${exhausted ? 'ud-count-zero' : ''}">${p.r} <span style="font-size:.7em;opacity:.6;">/ ${p.l}</span></span>
+                                        </div>
+                                        <div class="ud-progress-track">
+                                            <div class="ud-progress-bar" style="width:${pct}%; background:${barColor};"></div>
+                                        </div>
+                                    </div>
+
+                                    <!-- Action -->
+                                    ${exhausted ? `
+                                        <div class="ud-proj-exhausted-msg">
+                                            <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+                                            Demo finalizada — sin intentos disponibles
+                                        </div>
+                                    ` : `
+                                        <button class="ud-btn-access" onclick="openDemoProject(${p.idx})">
+                                            <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+                                            Acceder al Proyecto
+                                        </button>
+                                    `}
+                                </article>`;
+                            }).join('')}
+                        </div>
+                    `}
+                </div>
+            </section>
+        `;
+
+        lucide.createIcons();
+    }
+
+    /* ── DEMO IFRAME ── */
+    function openDemoProject(idx) {
+        pendingIframe = { idx };
+        const packed  = currentUser?.packed;
+        const rest    = splitSemi(packed?.intentos_restantes).map(v => toIntSafe(v, 0));
+        document.getElementById('confirmAttempts').textContent = rest[idx] ?? 0;
+        document.getElementById('btnConfirmAttempt').onclick = confirmAndOpenIframe;
+        openModal('confirmModal');
+    }
+
+    async function confirmAndOpenIframe() {
+        if (!pendingIframe) return;
+        const idx    = pendingIframe.idx;
+        const packed = currentUser?.packed;
+        const ids    = splitSemi(packed?.proyecto_id);
+        const finals = splitSemi(packed?.final);
+        const rest   = splitSemi(packed?.intentos_restantes).map(v => toIntSafe(v, 0));
+        const current = rest[idx] ?? 0;
+
+        if (current <= 0) { showToast('No tenés intentos disponibles', 'error'); closeModal('confirmModal'); pendingIframe = null; return; }
+
+        rest[idx] = current - 1;
+        try {
+            const updated = await db.updateUsuarioPacked(packed.id, { intentos_restantes: joinSemi(rest) });
+            currentUser.packed = updated;
+            sessionStorage.setItem('one_user', JSON.stringify(currentUser));
+            closeModal('confirmModal');
+
+            const projectId = ids[idx] ?? '';
+            const proj  = window.__projectsById?.get(String(projectId));
+            const title = proj?.proyecto || (projectId ? `Proyecto #${projectId}` : 'Proyecto Demo');
+            const url   = finals[idx] ?? '';
+
+            document.getElementById('iframeTitle').textContent = title;
+            document.getElementById('projectIframe').src = url || 'about:blank';
+            document.getElementById('iframeViewer').classList.add('active');
+        } catch(e) { console.error(e); showToast('Error al acceder', 'error'); }
+        pendingIframe = null;
+    }
+
+    function closeIframeViewer() {
+        document.getElementById('iframeViewer').classList.remove('active');
+        document.getElementById('projectIframe').src = 'about:blank';
+        renderApp();
+    }
+
+
+function openDetails(idx){
+    const items = window.__ud_items || [];
+    const p = items.find(x => Number(x.idx) === Number(idx));
+    if (!p) return;
+
+    // Buscar info “full” desde el proyecto (si existe en el Map)
+    const packed = currentUser?.packed;
+    const ids    = splitSemi(packed?.proyecto_id);
+    const projectId = ids[idx] ?? p.id ?? '';
+
+    const proj = window.__projectsById?.get(String(projectId)) || null;
+
+    const fullDesc = ((proj?.que_es ?? p.full ?? '') + '').trim();
+    const focus    = ((proj?.enfocado_a ?? p.focus ?? '') + '').trim();
+    const owner    = ((proj?.encargado ?? p.owner ?? '') + '').trim();
+    const base     = (p.base ?? '').trim();
+
+    const title = (proj?.proyecto ?? p.name ?? 'Proyecto').trim();
+
+    document.getElementById('detailsTitle').textContent = title;
+
+    document.getElementById('detailsBody').innerHTML = `
+        <div class="details-grid">
+            <div class="details-meta">
+                ${base ? `<span class="details-chip">📁 <strong>${escapeHtml(base)}</strong></span>` : ''}
+            </div>
+
+            ${fullDesc ? `<div class="details-desc">${escapeHtml(fullDesc)}</div>` : ''}
+
+            ${focus ? `<div class="details-desc" style="border-color:rgba(255,45,155,.18);">🎯 Áreas: ${escapeHtml(focus)}</div>` : ''}
+
+            <div class="details-actions">
+                ${p.manual ? `
+                    <a class="ud-proj-manual" href="${escapeHtml(p.manual)}" target="_blank" rel="noopener noreferrer">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/>
+                            <path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/>
+                        </svg>
+                        Ver Manual
+                    </a>
+                ` : ''}
+
+                ${p.r > 0 ? `
+                    <button class="ud-btn-access" type="button" onclick="closeModal('detailsModal'); openDemoProject(${p.idx});">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                            <polygon points="5 3 19 12 5 21 5 3"/>
+                        </svg>
+                        Acceder al Proyecto
+                    </button>
+                ` : `
+
+                `}
+            </div>
+        </div>
+    `;
+
+    openModal('detailsModal');
+}
+
+    </script>
+</body>
+</html>

@@ -1,0 +1,248 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="#060410">
+    <title>ONE | Ingresar</title>
+
+    <link rel="icon" type="image/png" href="../assets/favicon.png">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Exo+2:wght@300;400;600;700;800&display=swap" rel="stylesheet">
+
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+
+    <link rel="stylesheet" href="../css/styles.css">
+    <link rel="stylesheet" href="../css/pages/login.css">
+</head>
+<body>
+
+    <canvas id="starsCanvas"></canvas>
+    <div class="bg-hex"></div>
+    <div class="bg-cosmos"></div>
+
+    <div class="login-wrap">
+
+        <!-- LEFT — branding -->
+        <div class="login-left">
+            <a href="../index.html" class="login-brand">
+                <img src="../assets/one-logocolor.png" alt="ONE" class="login-brand-logo">
+            </a>
+            <div class="login-left-content">
+                <p class="login-left-eyebrow">Argentina &amp; LATAM</p>
+                <h2 class="login-left-title">La plataforma<br>de proyectos<br><span class="login-left-gradient">impulsada por IA.</span></h2>
+                <p class="login-left-sub">Gestioná, documentá y escalá cada proyecto desde un solo lugar.</p>
+                <div class="login-features">
+                    <div class="login-feature">
+                        <div class="login-feature-dot cyan"></div>
+                        <span>Gestión centralizada de proyectos</span>
+                    </div>
+                    <div class="login-feature">
+                        <div class="login-feature-dot pink"></div>
+                        <span>Acceso por roles y permisos</span>
+                    </div>
+                    <div class="login-feature">
+                        <div class="login-feature-dot violet"></div>
+                        <span>Demos controladas con intentos</span>
+                    </div>
+                </div>
+            </div>
+            <div class="login-left-orb"></div>
+        </div>
+
+        <!-- RIGHT — form -->
+        <div class="login-right">
+            <div class="login-card">
+
+                <!-- Logo mobile -->
+                <a href="../index.html" class="login-logo-mobile">
+                    <img src="../assets/one-cuadradocolor.png" alt="ONE">
+                </a>
+
+                <div class="login-card-header">
+                    <h1 class="login-card-title">Bienvenido</h1>
+                    <p class="login-card-sub">Seleccioná tu tipo de acceso e ingresá tus credenciales</p>
+                </div>
+
+                <!-- Type tabs -->
+                <div class="login-tabs">
+                    <button class="login-tab active" data-type="usuario">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+                        Usuario Demo
+                    </button>
+                    <button class="login-tab" data-type="admin">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.07 4.93a10 10 0 0 1 0 14.14M4.93 4.93a10 10 0 0 0 0 14.14"/></svg>
+                        Admin
+                    </button>
+                    <button class="login-tab" data-type="superadmin">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
+                        SuperAdmin
+                    </button>
+                </div>
+
+                <!-- Error -->
+                <div id="loginError" class="login-error hidden">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+                    <span id="loginErrorText"></span>
+                </div>
+
+                <!-- Form -->
+                <form id="loginForm">
+                    <input type="hidden" id="loginType" value="usuario">
+
+                    <div class="form-group">
+                        <label class="form-label">Usuario</label>
+                        <div class="form-input-wrap">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+                            <input type="text" class="form-input" id="loginUser" required placeholder="Tu nombre de usuario" autocomplete="username">
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">Contraseña</label>
+                        <div class="form-input-wrap">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+                            <input type="password" class="form-input" id="loginPass" required placeholder="Tu contraseña" autocomplete="current-password">
+                            <button type="button" class="toggle-pass" id="togglePass" tabindex="-1">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+                            </button>
+                        </div>
+                    </div>
+
+                    <button type="submit" class="btn-login" id="btnLogin">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"/><polyline points="10 17 15 12 10 7"/><line x1="15" y1="12" x2="3" y2="12"/></svg>
+                        Ingresar
+                    </button>
+                </form>
+
+                <div class="login-back">
+                    <a href="../index.html" class="login-back-link">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/></svg>
+                        Volver al inicio
+                    </a>
+                </div>
+
+            </div>
+        </div>
+
+    </div>
+
+    <div class="toast-container" id="toastContainer"></div>
+
+    <script src="../js/brand-config.js"></script>
+    <script src="../js/supabase-service.js"></script>
+    <script src="../js/shared.js"></script>
+    <script>
+    /* ── CANVAS ── */
+    (function () {
+        const cv = document.getElementById('starsCanvas'), ctx = cv.getContext('2d');
+        const PC = ['#ff2d9b','#00f5ff','#8b5cf6','#39ff14'];
+        let W, H, stars, parts, frame = 0;
+        function resize() { W = cv.width = window.innerWidth; H = cv.height = window.innerHeight; }
+        function build() {
+            stars = Array.from({length:140},()=>({x:Math.random()*W,y:Math.random()*H,r:Math.random()*.8+.2,sp:Math.random()*.005+.002,ph:Math.random()*Math.PI*2}));
+            parts = Array.from({length:14},()=>({x:Math.random()*W,y:Math.random()*H,r:Math.random()*1.5+.8,c:PC[Math.floor(Math.random()*PC.length)],vx:(Math.random()-.5)*.2,vy:(Math.random()-.5)*.2,sp:Math.random()*.007+.003,ph:Math.random()*Math.PI*2}));
+        }
+        function draw() {
+            ctx.clearRect(0,0,W,H); frame++;
+            stars.forEach(s=>{const a=.1+.4*(.5+.5*Math.sin(frame*s.sp+s.ph));ctx.beginPath();ctx.arc(s.x,s.y,s.r,0,Math.PI*2);ctx.fillStyle=`rgba(210,220,255,${a})`;ctx.fill();});
+            parts.forEach(p=>{p.x+=p.vx;p.y+=p.vy;if(p.x<0)p.x=W;if(p.x>W)p.x=0;if(p.y<0)p.y=H;if(p.y>H)p.y=0;const a=.2+.4*(.5+.5*Math.sin(frame*p.sp+p.ph));ctx.save();ctx.globalAlpha=a*.6;ctx.shadowBlur=8;ctx.shadowColor=p.c;ctx.fillStyle=p.c;ctx.beginPath();ctx.arc(p.x,p.y,p.r,0,Math.PI*2);ctx.fill();ctx.restore();});
+            requestAnimationFrame(draw);
+        }
+        resize(); build(); draw();
+        window.addEventListener('resize',()=>{resize();build();},{passive:true});
+    })();
+
+    /* ── TOGGLE PASSWORD ── */
+    document.getElementById('togglePass').addEventListener('click', () => {
+        const input = document.getElementById('loginPass');
+        const isPass = input.type === 'password';
+        input.type = isPass ? 'text' : 'password';
+        document.getElementById('togglePass').innerHTML = isPass
+            ? `<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94"/><path d="M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19"/><line x1="1" y1="1" x2="23" y2="23"/></svg>`
+            : `<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>`;
+    });
+
+    document.addEventListener('DOMContentLoaded', () => {
+        lucide.createIcons();
+
+        /* Tabs */
+        document.querySelectorAll('.login-tab').forEach(tab => {
+            tab.addEventListener('click', () => {
+                document.querySelectorAll('.login-tab').forEach(t => t.classList.remove('active'));
+                tab.classList.add('active');
+                document.getElementById('loginType').value = tab.dataset.type;
+                document.getElementById('loginError').classList.add('hidden');
+            });
+        });
+
+        /* Form submit */
+        document.getElementById('loginForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const type = document.getElementById('loginType').value;
+            const user = document.getElementById('loginUser').value.trim();
+            const pass = document.getElementById('loginPass').value;
+
+            document.getElementById('loginError').classList.add('hidden');
+            const btn = document.getElementById('btnLogin');
+            btn.disabled = true;
+            btn.classList.add('loading');
+            btn.innerHTML = `<span class="btn-spinner"></span> Ingresando...`;
+
+            try {
+                if (type === 'superadmin')    await loginSuperAdmin(user, pass);
+                else if (type === 'admin')    await loginAdmin(user, pass);
+                else                          await loginUsuario(user, pass);
+            } catch (error) {
+                showLoginError(error.message);
+            } finally {
+                btn.disabled = false;
+                btn.classList.remove('loading');
+                btn.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"/><polyline points="10 17 15 12 10 7"/><line x1="15" y1="12" x2="3" y2="12"/></svg> Ingresar`;
+            }
+        });
+    });
+
+    async function loginSuperAdmin(user, pass) {
+        if (user === BRAND_CONFIG.defaultSuperAdmin.username && pass === BRAND_CONFIG.defaultSuperAdmin.password) {
+            saveSession({ username:'Facundo', email:'superadmin@one.com', rol:'superadmin' }, 'superadmin');
+            window.location.href = './superadmin.html'; return;
+        }
+        const data = await db.loginAdmin(user, pass);
+        if (data && data.rol === 'superadmin') {
+            saveSession({ username:data.admin_username, email:data.email_superadmin||'', rol:'admin', ...data }, 'superadmin');
+            window.location.href = './superadmin.html';
+        } else throw new Error('Credenciales de SuperAdmin incorrectas');
+    }
+
+    async function loginAdmin(user, pass) {
+        const data = await db.loginAdmin(user, pass);
+        if (data && data.rol === 'admin') {
+            saveSession({ username:data.admin_username, email:data.email_superadmin||'', rol:'admin', ...data }, 'admin');
+            window.location.href = './admin.html';
+        } else throw new Error('Credenciales de Admin incorrectas');
+    }
+
+    async function loginUsuario(user, pass) {
+        const row = await db.loginUsuario(user, pass);
+        if (row) {
+            saveSession({ username:user, packed:row }, 'usuario');
+            window.location.href = './usuario.html';
+        } else throw new Error('Usuario demo no encontrado o credenciales incorrectas');
+    }
+
+    function saveSession(userData, role) {
+        sessionStorage.setItem('one_user', JSON.stringify(userData));
+        sessionStorage.setItem('one_role', role);
+    }
+
+    function showLoginError(msg) {
+        const el   = document.getElementById('loginError');
+        document.getElementById('loginErrorText').textContent = msg;
+        el.classList.remove('hidden');
+    }
+    </script>
+</body>
+</html>
